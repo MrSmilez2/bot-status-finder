@@ -12,6 +12,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 import re
 import time
 
+from constants import Format
+from helpers import get_cell_templates
+
 app = Flask(__name__)
 sslify = SSLify(app)
 
@@ -34,7 +37,8 @@ def create_connection():
              "https://www.googleapis.com/auth/drive"]
 
     creds = ServiceAccountCredentials.from_json_keyfile_name(
-        os.environ.get('KEY_FILE_NAME') or '/home/mrsmilez3/bot/Creds.json',
+        f"{os.environ.get('KEY_FILE_NAME') or '/home/mrsmilez3/bot'}"
+        f"/Creds.json",
         scope
     )
     client = gspread.authorize(creds)
@@ -72,31 +76,21 @@ def order_status(number_order, sheet, answer_sheet):
             steel_type = sheet.cell(row_coordinate, 4).value
             steel_depth = sheet.cell(row_coordinate, 5).value
             check_f_row = f'F{row_coordinate}'
-            if get_user_entered_format(sheet,
-                                       f'{cell_address}').backgroundColor == get_user_entered_format(
-                answer_sheet, 'A5').backgroundColor:
+
+            templates = get_cell_templates(answer_sheet, Format)
+            user_cell = get_user_entered_format(sheet,
+                                       f'{cell_address}').backgroundColor
+            user_f_row_cell = get_user_entered_format(sheet,
+                                         f'{check_f_row}').backgroundColor
+
+            if user_cell == templates[Format.A5]:
                 result = result + f'Детали из {steel_type} толщиной {steel_depth} - {list_of_answers[8]}\n\n'
-            elif get_user_entered_format(sheet,
-                                         f'{cell_address}').backgroundColor == get_user_entered_format(
-                    answer_sheet, 'A3').backgroundColor and get_user_entered_format(sheet,
-                                         f'{check_f_row}').backgroundColor == get_user_entered_format(
-                    answer_sheet, 'A4').backgroundColor:
+            elif user_cell == templates[Format.A3] and user_f_row_cell == templates[Format.A4]:
                 result = result + f'Детали из {steel_type} толщиной {steel_depth} - {list_of_answers[6]}\n\n'
-            elif get_user_entered_format(sheet,
-                                         f'{cell_address}').backgroundColor == get_user_entered_format(
-                    answer_sheet, 'A4').backgroundColor:
+            elif user_cell == templates[Format.A4]:
                 result = result + f'Детали из {steel_type} толщиной {steel_depth} - {list_of_answers[7]}\n\n'
-            elif get_user_entered_format(sheet,
-                                         f'{cell_address}').backgroundColor == get_user_entered_format(
-                    answer_sheet, 'A3').backgroundColor and get_user_entered_format(sheet,
-                                         f'{check_f_row}').backgroundColor == get_user_entered_format(
-                    answer_sheet, 'A3').backgroundColor:
+            elif user_cell == templates[Format.A3] and user_f_row_cell == templates[Format.A3]:
                 result = result + f'Детали из {steel_type} толщиной {steel_depth} - {list_of_answers[5]}\n\n'
-            # elif get_user_entered_format(sheet,
-            #                              f'{cell_address}').backgroundColor == get_user_entered_format(
-            #         answer_sheet, 'A1').backgroundColor or get_user_entered_format(sheet,
-            #                              f'{cell_address}').backgroundColor == get_user_entered_format(
-            #         answer_sheet, 'A2').backgroundColor:
             else:
                 result = result + f'Детали из {steel_type} толщиной {steel_depth} - {list_of_answers[4]}\n\n'
     else:
@@ -128,4 +122,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=int(os.environ.get('BOT_PORT') or 5000))
