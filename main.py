@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask import request
 from flask import jsonify
@@ -9,7 +11,6 @@ from gspread_formatting import get_user_entered_format
 from oauth2client.service_account import ServiceAccountCredentials
 import re
 import time
-import json
 
 app = Flask(__name__)
 sslify = SSLify(app)
@@ -32,8 +33,10 @@ def create_connection():
              "https://www.googleapis.com/auth/drive.file",
              "https://www.googleapis.com/auth/drive"]
 
-    creds = ServiceAccountCredentials.from_json_keyfile_name('/home/mrsmilez3/bot/Creds.json',
-                                                             scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        os.environ.get('KEY_FILE_NAME') or '/home/mrsmilez3/bot/Creds.json',
+        scope
+    )
     client = gspread.authorize(creds)
     document = client.open('Transfercopy')
     sheet = document.worksheet('Производство')
