@@ -24,7 +24,7 @@ class TelegramClient:
             message=template.format(**message_data)
         )
         requests.get(
-            url, params={
+            url, params={  # type: ignore
                 "chat_id": self.chat_id,
                 "text": message,
             }

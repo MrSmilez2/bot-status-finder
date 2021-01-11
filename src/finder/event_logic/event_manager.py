@@ -1,11 +1,12 @@
-# Third Party Library
-import enum
+# Standard Library
 import logging
 from dataclasses import (
     dataclass,
     field,
 )
+from typing import Optional
 
+# Third Party Library
 from django.conf import settings
 from django.db import transaction
 
@@ -25,7 +26,7 @@ logger = logging.getLogger(f"{settings.PROJECT}.event")
 @dataclass
 class EventManager:
     gspread_client: GSpreadClient
-    error: str = field(init=False, default=None)
+    error: Optional[str] = field(init=False, default=None)
     status: EventManagerStatus = field(
         default=EventManagerStatus.IN_PROGRESS,
         init=False,

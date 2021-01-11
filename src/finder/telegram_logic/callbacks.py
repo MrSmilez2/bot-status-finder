@@ -15,8 +15,8 @@ SUCCESS_MESSAGE_TEMPLATE = "Event searching order {order_id} has been created"
 
 
 def event_success_callback(data: Dict[int, int]):
-    chat_id = data["chat_id"]
-    order_id = data["order_id"]
+    chat_id = data["chat_id"]  # type: ignore
+    order_id = data["order_id"]  # type: ignore
     client = TelegramClient(chat_id)
     client.send_message(
         order_id=order_id,

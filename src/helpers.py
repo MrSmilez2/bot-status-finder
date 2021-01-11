@@ -1,9 +1,10 @@
-# Third Party Library
-import enum
+# Standard Library
 from logging import Logger
 
+# Third Party Library
 from rest_framework import serializers
 
+# Application Library
 from constants import MessageLevel
 from finder.telegram_logic.client import TelegramClient
 
