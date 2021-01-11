@@ -34,7 +34,7 @@ class TelegramPostMixin:
         try:
             return super().post(request, *args, **kwargs)
         except serializers.ValidationError as exc:
-            with suppress(KeyError):
+            with suppress(KeyError, AttributeError, TypeError):
                 chat_id = request.data["message"]["chat"]["id"]
                 self.error_callback(chat_id, exc)
             return Response(status=status.HTTP_200_OK)

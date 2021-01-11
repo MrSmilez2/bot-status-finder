@@ -1,0 +1,2 @@
+class GSpreadClient:
+    pass

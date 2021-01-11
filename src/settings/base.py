@@ -188,7 +188,13 @@ LOGGING = {
             "class": "logging.FileHandler",
             "formatter": "default",
             "filename": LOG_DIR + "/workers.log",
-        }
+        },
+        "event_handler": {
+            "level": LOG_LEVEL,
+            "class": "logging.FileHandler",
+            "formatter": "default",
+            "filename": LOG_DIR + "/events.log",
+        },
     },
     'loggers': {
         PROJECT: {
@@ -200,6 +206,13 @@ LOGGING = {
         f"{PROJECT}.worker": {
             "handlers": [
                 "console_handler", "worker_handler"
+            ],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        f"{PROJECT}.event": {
+            "handlers": [
+                "console_handler", "event_handler"
             ],
             "level": LOG_LEVEL,
             "propagate": False,

@@ -46,3 +46,7 @@ class Event(models.Model):
         self.status = self.EventStatus.FINISHED
         self.finished_at = now()
         self.save()
+
+    def set_in_progress(self):
+        self.status = self.EventStatus.IN_PROGRESS
+        self.save()

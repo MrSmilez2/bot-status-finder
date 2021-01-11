@@ -8,12 +8,24 @@ class TelegramClient:
     BOT_URL = BASE_URL.format(token=settings.TELEGRAM_TOKEN)
     SEND_MESSAGE_URL = f"{BOT_URL}sendMessage"
 
-    def send_message(self, chat_id, data, template=None):
-        message = template.format(**data) if template else data["message"]
-        url = self.SEND_MESSAGE_URL.format(chat_id=chat_id, message=message)
+    def __init__(self, chat_id: int):
+        self.chat_id = chat_id
+
+    def send_message(
+            self,
+            message: str = None,
+            template: str = "{message}",
+            **kwargs
+    ):
+        message_data = {"message": message} if message is not None else {}
+        message_data.update(**kwargs)
+        url = self.SEND_MESSAGE_URL.format(
+            chat_id=self.chat_id,
+            message=template.format(**message_data)
+        )
         requests.get(
             url, params={
-                "chat_id": chat_id,
+                "chat_id": self.chat_id,
                 "text": message,
             }
         )
