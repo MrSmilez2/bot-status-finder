@@ -1,9 +1,5 @@
 # Standard Library
 import logging
-from dataclasses import (
-    dataclass,
-    field,
-)
 from typing import Optional
 
 # Third Party Library
@@ -15,7 +11,10 @@ from constants import (
     EventManagerStatus,
     MessageLevel,
 )
-from finder.gspread_logic.client import GSpreadClient
+from finder.gspread_logic.client import (
+    GSpreadClient,
+    get_gspread_client,
+)
 from finder.models import Event
 from finder.telegram_logic.client import TelegramClient
 from helpers import operate_message
@@ -23,22 +22,19 @@ from helpers import operate_message
 logger = logging.getLogger(f"{settings.PROJECT}.event")
 
 
-@dataclass
 class EventManager:
-    gspread_client: GSpreadClient
-    error: Optional[str] = field(init=False, default=None)
-    status: EventManagerStatus = field(
-        default=EventManagerStatus.IN_PROGRESS,
-        init=False,
-    )
+    def __init__(self):
+        self.gspread_client: GSpreadClient = get_gspread_client()
+        self.error: Optional[str] = None
+        self.status: EventManagerStatus = EventManagerStatus.IN_PROGRESS
 
-    event: Event = field(init=False)
-    chat_id: int = field(init=False)
-    client: TelegramClient = field(init=False)
+        self.event: Optional[Event] = None
+        self.chat_id: Optional[int] = None
+        self.client: Optional[TelegramClient] = None
 
-    def __post_init__(self):
+    def post_init(self):
         self.event = Event.objects.select_for_update().filter(
-            status=Event.EventStatus.IN_PROGRESS
+            status=Event.EventStatus.WAITING
         ).first()
         self.chat_id = self.event and self.event.chat_id
         self.client = self.event and TelegramClient(self.chat_id)
@@ -57,17 +53,17 @@ class EventManager:
         operate_message(logger, self.client, message, MessageLevel.ERROR)
 
     def process_event(self):
-        if not self.event:
-            self.status = EventManagerStatus.SKIP
-            return
-
         self.event.set_in_progress()
 
     def process(self):
         with transaction.atomic():
-            try:
-                self.process_event()
-            except Exception as exc:
-                self._operate_error(exc)
+            self.post_init()
+            if self.event:
+                try:
+                    self.process_event()
+                except Exception as exc:
+                    self._operate_error(exc)
+                else:
+                    self._operate_success()
             else:
-                self._operate_success()
+                self.status = EventManagerStatus.SKIP

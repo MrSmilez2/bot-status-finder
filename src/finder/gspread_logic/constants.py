@@ -1,4 +1,4 @@
-SCOPE = [
+SCOPES = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",

@@ -9,18 +9,15 @@ from django.core.management import BaseCommand
 # Application Library
 from constants import EventManagerStatus
 from finder.event_logic.event_manager import EventManager
-from finder.gspread_logic.client import GSpreadClient
 
 logger = logging.getLogger(f"{settings.PROJECT}.worker")
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        gspread_client = GSpreadClient()
-
         while True:
             logger.info("Start iteration")
-            event_manager = EventManager(gspread_client)
+            event_manager = EventManager()
             event_manager.process()
             logger.info(
                 f"Finished to proceed event "

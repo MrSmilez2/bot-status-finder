@@ -16,10 +16,6 @@ PROJECT = "STATUSFINDER"
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "q58rhp6g61&ygrm)x2!5u%7wa)m-d$0-s8srud^uee8h_=*a6v"
 
@@ -30,7 +26,6 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -52,7 +47,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "bot_status_finder.urls"
+ROOT_URLCONF = "urls"
 
 TEMPLATES = [
     {
@@ -70,12 +65,10 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "bot_status_finder.wsgi.application"
+WSGI_APPLICATION = "wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
+# Databases
 DEFAULT_DB = "default"
 
 POSTGRES_DEFAULT_HOST = os.getenv("POSTGRES_DEFAULT_HOST", "localhost")
@@ -97,9 +90,46 @@ DATABASES = {
     },
 }
 
+# Redis Cache
+CACHE_REDIS_LOCATION = os.getenv("CACHE_REDIS_LOCATION")
+CACHE_REDIS_SCHEMA = os.getenv("CACHE_REDIS_SCHEMA", "redis")
+CACHE_REDIS_HOST = os.getenv("CACHE_REDIS_SCHEMA", "localhost")
+CACHE_REDIS_PORT = os.getenv("CACHE_REDIS_SCHEMA", "6379")
+CACHE_REDIS_DATABASE = os.getenv("CACHE_REDIS_SCHEMA", "0")
+CACHE_REDIS_TIMEOUT = int(os.getenv("CACHE_REDIS_SCHEMA", 5 * 60))  # 5 minutes
+
+if not CACHE_REDIS_LOCATION:
+    CACHE_REDIS_LOCATION = "{schema}://{host}:{port}/{db}".format(
+        schema=CACHE_REDIS_SCHEMA,
+        host=CACHE_REDIS_HOST,
+        port=CACHE_REDIS_PORT,
+        db=CACHE_REDIS_DATABASE
+    )
+
+CACHE_REDIS = {
+    "BACKEND": "django_redis.cache.RedisCache",
+    "LOCATION": CACHE_REDIS_LOCATION,
+    "OPTIONS": {
+        "CLIENT_CLASS": "django_redis.client.DefaultClient"
+    },
+    "TIMEOUT": CACHE_REDIS_TIMEOUT
+}
+
+# Caches
+CACHES = {
+    "default": CACHE_REDIS,
+}
+
+CACHE_ENABLED = True
+
+############################# Workers
+EVENT_WORKER_TIMEOUT = 5
+
+# Telegram
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
 
-EVENT_WORKER_TIMEOUT = 5
+# Google API
+KEY_FILE_PATH = f"{os.environ.get('KEY_FILE_PATH', BASE_DIR)}/Creds.json"
 
 
 # Password validation
@@ -143,6 +173,7 @@ STATIC_URL = "/static/"
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 LOG_LEVEL = "DEBUG"
 
+# Logging
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -196,7 +227,7 @@ LOGGING = {
             "filename": LOG_DIR + "/events.log",
         },
     },
-    'loggers': {
+    "loggers": {
         PROJECT: {
             "handlers": [
                 "console_handler", "default_handler"
