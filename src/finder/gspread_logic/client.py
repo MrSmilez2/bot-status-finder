@@ -10,8 +10,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 # Application Library
 from finder.gspread_logic.constants import SCOPES
 
-_gspread_client = None
-
 
 class GSpreadClient:
     def __init__(
@@ -25,14 +23,3 @@ class GSpreadClient:
             scopes=self.scopes
         )
         self._client: Client = gspread.authorize(self.creds)
-
-
-def init_gspread_client():
-    global _gspread_client
-    _gspread_client = GSpreadClient()
-    return _gspread_client
-
-
-def get_gspread_client() -> GSpreadClient:
-    global _gspread_client
-    return _gspread_client or init_gspread_client()

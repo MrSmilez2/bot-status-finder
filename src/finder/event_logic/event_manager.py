@@ -11,10 +11,7 @@ from constants import (
     EventManagerStatus,
     MessageLevel,
 )
-from finder.gspread_logic.client import (
-    GSpreadClient,
-    get_gspread_client,
-)
+from finder.gspread_logic.client import GSpreadClient
 from finder.models import Event
 from finder.telegram_logic.client import TelegramClient
 from helpers import operate_message
@@ -24,7 +21,7 @@ logger = logging.getLogger(f"{settings.PROJECT}.event")
 
 class EventManager:
     def __init__(self):
-        self.gspread_client: GSpreadClient = get_gspread_client()
+        self.gspread_client: GSpreadClient = GSpreadClient()
         self.error: Optional[str] = None
         self.status: EventManagerStatus = EventManagerStatus.IN_PROGRESS
 
