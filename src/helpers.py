@@ -3,7 +3,6 @@ import pickle
 from collections import Callable
 from functools import wraps
 from logging import Logger
-from typing import Union
 
 # Third Party Library
 from django.conf import settings
@@ -52,22 +51,22 @@ def operate_message(
     )
 
 
-def cached_method(cache_key: Union[Callable, str], timeout: int):
+def cached_method(key_function: Callable, timeout: int):
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             if not settings.CACHE_ENABLED:
                 return func(*args, **kwargs)
-            key = cache_key(*args, **kwargs) \
-                if callable(cache_key) else cache_key
-            cached_data = cache.get(key)
+
+            cache_key = key_function(*args, **kwargs)
+            cached_data = cache.get(cache_key)
 
             if cached_data is not None:
                 return pickle.loads(cached_data)
 
             data = func(*args, **kwargs)
             if data is not None:
-                cache.set(key, pickle.dumps(data), timeout)
+                cache.set(cache_key, pickle.dumps(data), timeout)
 
             return data
         return wrapper

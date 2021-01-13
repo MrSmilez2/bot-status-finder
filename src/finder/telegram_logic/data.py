@@ -23,9 +23,3 @@ class Message:
             self.order_id = raw_message.get("text")
         except AttributeError:
             raise ValidationError("Wrong message data")
-
-    def to_dict(self):
-        return {
-            "chat_id": self.chat_id,
-            "order_id": self.order_id,
-        }

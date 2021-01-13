@@ -1,5 +1,6 @@
 # Standard Library
 from contextlib import suppress
+from dataclasses import asdict
 from typing import Any
 
 # Third Party Library
@@ -47,7 +48,7 @@ class EventCreateView(TelegramPostMixin, CreateCallbackMixin, CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         message = Message(request.data)
-        serializer = self.get_serializer(data=message.to_dict())
+        serializer = self.get_serializer(data=asdict(message))
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
