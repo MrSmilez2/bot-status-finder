@@ -11,7 +11,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    Optional,
     Tuple,
 )
 
@@ -97,8 +96,8 @@ class GoogleTableDataManager:
             ] and data.user_f_row_color == ts[PaperFormat.A3],
             5
         ),
-        (lambda data, ts: True, 4),
     ]
+    DEFAULT_ANSWER_NUMBER = 4
 
     def __init__(self):
         self._client = get_gspread_client()
@@ -143,12 +142,11 @@ class GoogleTableDataManager:
         logger.debug("Get answers list from server")
         return self.answer_sheet.col_values(4)
 
-    def get_answer_number(  # type: ignore
-            self, table_data: TableData
-    ) -> Optional[int]:
+    def get_answer_number(self, table_data: TableData) -> int:
         for case, answer_number in self.CASES:
             if case(table_data, self.cell_templates):
                 return answer_number
+        return self.DEFAULT_ANSWER_NUMBER
 
     @cached_method(get_orders_cache_key, settings.ORDERS_TTL)
     def process_order(self, order_id: int) -> List[str]:
