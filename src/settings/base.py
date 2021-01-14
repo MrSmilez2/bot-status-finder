@@ -122,7 +122,10 @@ CACHES = {
 
 CACHE_ENABLED = True
 
-############################# Workers
+TEMPLATES_CACHE_TTL = 60 * 60  # 1 hour
+ANSWERS_LIST_TTL = 60 * 60  # 1 hour
+
+# Workers
 EVENT_WORKER_TIMEOUT = 5
 
 # Telegram

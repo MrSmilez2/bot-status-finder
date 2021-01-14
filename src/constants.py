@@ -21,3 +21,10 @@ class EventManagerStatus(AutoName):
     SKIP = enum.auto()
     SUCCESS = enum.auto()
     ERROR = enum.auto()
+
+
+@enum.unique
+class PaperFormat(AutoName):
+    A5 = enum.auto()
+    A4 = enum.auto()
+    A3 = enum.auto()
