@@ -96,7 +96,7 @@ CACHE_REDIS_SCHEMA = os.getenv("CACHE_REDIS_SCHEMA", "redis")
 CACHE_REDIS_HOST = os.getenv("CACHE_REDIS_SCHEMA", "localhost")
 CACHE_REDIS_PORT = os.getenv("CACHE_REDIS_SCHEMA", "6379")
 CACHE_REDIS_DATABASE = os.getenv("CACHE_REDIS_SCHEMA", "0")
-CACHE_REDIS_TIMEOUT = int(os.getenv("CACHE_REDIS_SCHEMA", 5 * 60))  # 5 minutes
+CACHE_REDIS_TIMEOUT = int(os.getenv("CACHE_REDIS_SCHEMA", 60 * 60))  # 1 hour
 
 if not CACHE_REDIS_LOCATION:
     CACHE_REDIS_LOCATION = "{schema}://{host}:{port}/{db}".format(
@@ -124,6 +124,7 @@ CACHE_ENABLED = True
 
 TEMPLATES_CACHE_TTL = 60 * 60  # 1 hour
 ANSWERS_LIST_TTL = 60 * 60  # 1 hour
+ORDERS_TTL = 5 * 60  # 5 minutes
 
 # Workers
 EVENT_WORKER_TIMEOUT = 5
