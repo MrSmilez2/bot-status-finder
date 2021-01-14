@@ -127,7 +127,7 @@ ANSWERS_LIST_TTL = 60 * 60  # 1 hour
 ORDERS_TTL = 5 * 60  # 5 minutes
 
 # Workers
-EVENT_WORKER_TIMEOUT = 5
+EVENT_WORKER_TIMEOUT = 5  # 5 sec
 
 # Telegram
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
@@ -135,6 +135,8 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
 # Google API
 KEY_FILE_PATH = f"{os.environ.get('KEY_FILE_PATH', BASE_DIR)}/Creds.json"
 
+# Misc
+ORDER_TIMEOUT = 3  # 3 sec
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

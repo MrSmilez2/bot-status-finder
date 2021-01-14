@@ -7,6 +7,7 @@ from dataclasses import (
     field,
 )
 from functools import cached_property
+from time import sleep
 from typing import (
     Callable,
     Dict,
@@ -165,7 +166,7 @@ class GoogleTableDataManager:
                     answer=self.answers_list[answer_number],
                 )
                 results.append(result)
-
+                sleep(settings.ORDER_TIMEOUT)
         else:
             results.append(f"{order_id} - {self.answers_list[3]}")
 
