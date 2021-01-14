@@ -75,7 +75,7 @@ class TableData:
             search_sheet, self.cell_address
         ).backgroundColor
         self.user_f_row_color = get_user_entered_format(
-            search_sheet, str(row)
+            search_sheet, f"F{row}"
         ).backgroundColor
 
 
@@ -152,7 +152,8 @@ class GoogleTableDataManager:
 
     @cached_method(get_orders_cache_key, settings.ORDERS_TTL)
     def process_order(self, order_id: int) -> List[str]:
-        orders = self.search_sheet.findall(str(order_id))
+        compiled_order_id = re.compile(str(order_id))
+        orders = self.search_sheet.findall(compiled_order_id)
         logger.debug(f"Get {len(orders)} orders")
         results = []
         if orders:
