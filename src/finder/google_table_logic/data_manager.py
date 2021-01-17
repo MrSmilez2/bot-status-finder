@@ -192,7 +192,6 @@ class FakeFormat:
 def get_format_safe(
         format_getter: Callable, *args, **kwargs
 ) -> Union[CellFormat, FakeFormat]:
-    format_getter = partial(format_getter, *args, **kwargs)
     cell_format = None
     with suppress(KeyError, AttributeError, TypeError):
         cell_format = format_getter(*args, **kwargs)
