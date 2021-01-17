@@ -19,13 +19,9 @@ class TelegramClient:
     ):
         message_data = {"message": message} if message is not None else {}
         message_data.update(**kwargs)
-        url = self.SEND_MESSAGE_URL.format(
-            chat_id=self.chat_id,
-            message=template.format(**message_data)
-        )
         requests.get(
-            url, params={  # type: ignore
+            self.SEND_MESSAGE_URL, params={  # type: ignore
                 "chat_id": self.chat_id,
-                "text": message,
+                "text": template.format(**message_data),
             }
         )

@@ -20,9 +20,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "q58rhp6g61&ygrm)x2!5u%7wa)m-d$0-s8srud^uee8h_=*a6v"
 
 # SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["167.99.242.224", "localhost"]
 
 
 # Application definition
@@ -73,9 +73,9 @@ DEFAULT_DB = "default"
 
 POSTGRES_DEFAULT_HOST = os.getenv("POSTGRES_DEFAULT_HOST", "localhost")
 POSTGRES_DEFAULT_PORT = os.getenv("POSTGRES_DEFAULT_PORT", 5432)
-POSTGRES_DEFAULT_USER = os.getenv("POSTGRES_DEFAULT_USER", "postgres")
-POSTGRES_DEFAULT_NAME = os.getenv("POSTGRES_DEFAULT_NAME", "status_bot_db")
-POSTGRES_DEFAULT_PASSWORD = os.getenv("POSTGRES_DEFAULT_HOST", "postgres")
+POSTGRES_DEFAULT_USER = os.getenv("POSTGRES_DEFAULT_USER", "django")
+POSTGRES_DEFAULT_NAME = os.getenv("POSTGRES_DEFAULT_NAME", "django")
+POSTGRES_DEFAULT_PASSWORD = os.getenv("POSTGRES_DEFAULT_PASSWORD", "django")
 POSTGRES_DEFAULT_CONN_MAX_AGE = 0
 
 DATABASES = {
@@ -177,7 +177,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 LOG_DIR = os.path.join(BASE_DIR, "logs")
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
 
 # Logging
 LOGGING = {
