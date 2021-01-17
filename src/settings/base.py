@@ -215,7 +215,7 @@ LOGGING = {
             "filters": ["require_debug_true"],
         },
         "default_handler": {
-            "level": LOG_LEVEL,
+            "level": "ERROR",
             "class": "logging.FileHandler",
             "formatter": "default",
             "filename": LOG_DIR + "/app.log",
@@ -232,8 +232,15 @@ LOGGING = {
             "formatter": "default",
             "filename": LOG_DIR + "/events.log",
         },
+        "null": {
+            "class": "logging.NullHandler",
+        },
     },
     "loggers": {
+        "django.security.DisallowedHost": {
+            "handlers": ["null"],
+            "propagate": False,
+        },
         PROJECT: {
             "handlers": [
                 "console_handler", "default_handler"
@@ -244,7 +251,7 @@ LOGGING = {
             "handlers": [
                 "console_handler", "worker_handler"
             ],
-            "level": LOG_LEVEL,
+            "level": "ERROR",
             "propagate": False,
         },
         f"{PROJECT}.event": {
