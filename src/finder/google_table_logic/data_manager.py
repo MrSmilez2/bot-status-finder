@@ -1,18 +1,24 @@
 # Standard Library
 import logging
 import re
+from contextlib import suppress
 from dataclasses import (
     InitVar,
     dataclass,
     field,
 )
-from functools import cached_property
+from functools import (
+    cached_property,
+    partial,
+)
 from time import sleep
 from typing import (
     Callable,
     Dict,
     List,
+    Optional,
     Tuple,
+    Union,
 )
 
 # Third Party Library
@@ -21,7 +27,10 @@ from gspread import (
     Spreadsheet,
     Worksheet,
 )
-from gspread_formatting import get_user_entered_format
+from gspread_formatting import (
+    CellFormat,
+    get_user_entered_format,
+)
 
 # Application Library
 from constants import PaperFormat
@@ -30,7 +39,7 @@ from helpers import cached_method
 
 logger = logging.getLogger(settings.PROJECT)
 
-CellTemplate = Dict[PaperFormat, str]
+CellTemplate = Dict[PaperFormat, Optional[str]]
 
 TEMPLATES_CACHE_KEY = "CELL_TEMPLATES"
 ANSWER_LIST_CACHE_KEY = "ANSWER_LIST"
@@ -58,8 +67,8 @@ class TableData:
     cell_address: str = field(init=False)
     steel_type: str = field(init=False)
     steel_depth: str = field(init=False)
-    user_cell_color: str = field(init=False)
-    user_f_row_color: str = field(init=False)
+    user_cell_color: Optional[str] = field(init=False)
+    user_f_row_color: Optional[str] = field(init=False)
 
     def __post_init__(self, order: str, search_sheet: Worksheet):
         row = int(re.search(r"(R[0-9]+)", order).group(0)[1:])  # type: ignore
@@ -71,17 +80,17 @@ class TableData:
         self.steel_type = search_sheet.cell(row, 4).value
         self.steel_depth = search_sheet.cell(row, 5).value
 
-        self.user_cell_color = get_user_entered_format(
-            search_sheet, self.cell_address
+        self.user_cell_color = get_format_safe(
+            get_user_entered_format, search_sheet, self.cell_address
         ).backgroundColor
-        self.user_f_row_color = get_user_entered_format(
-            search_sheet, f"F{row}"
+        self.user_f_row_color = get_format_safe(
+            get_user_entered_format, search_sheet, f"F{row}"
         ).backgroundColor
 
 
 class GoogleTableDataManager:
     RESULT_TEMPLATE = "Детали из {steel_type} " \
-                      "толщиной {steel_depth} - {answer}"
+                      "толщиной {steel_depth} мм - {answer}"
     CASES: List[Tuple[Callable[[TableData, CellTemplate], bool], int]] = [
         (lambda data, ts: data.user_cell_color == ts[PaperFormat.A5], 8),
         (
@@ -105,18 +114,18 @@ class GoogleTableDataManager:
 
     @cached_property
     def _document(self) -> Spreadsheet:
-        logger.debug("Get worksheet 'Transfercopy'")
-        return self._client.open("Transfercopy")
+        logger.debug(f"Get worksheet '{settings.DOCUMENT_NAME}'")
+        return self._client.open(settings.DOCUMENT_NAME)
 
     @cached_property
     def search_sheet(self) -> Worksheet:
-        logger.debug("Get worksheet 'Производство'")
-        return self._document.worksheet("Производство")
+        logger.debug(f"Get worksheet '{settings.SEARCH_SHEET_NAME}'")
+        return self._document.worksheet(settings.SEARCH_SHEET_NAME)
 
     @cached_property
     def answer_sheet(self) -> Worksheet:
-        logger.debug("Get worksheet 'telegram-bot'")
-        return self._document.worksheet("telegram-bot")
+        logger.debug(f"Get worksheet '{settings.ANSWER_SHEET_NAME}'")
+        return self._document.worksheet(settings.ANSWER_SHEET_NAME)
 
     @cached_property
     def cell_templates(self):
@@ -132,8 +141,10 @@ class GoogleTableDataManager:
     def _get_cell_templates(self) -> CellTemplate:
         templates = {}
         for paper_format in PaperFormat:
-            templates[paper_format] = get_user_entered_format(
-                self.search_sheet, paper_format.value
+            templates[paper_format] = get_format_safe(
+                get_user_entered_format,
+                self.answer_sheet,
+                paper_format.value
             ).backgroundColor
         logger.debug("Get cell templates")
         return templates
@@ -171,3 +182,19 @@ class GoogleTableDataManager:
             results.append(f"{order_id} - {self.answers_list[3]}")
 
         return results
+
+
+@dataclass
+class FakeFormat:
+    backgroundColor: Optional[str] = None
+
+
+def get_format_safe(
+        format_getter: Callable, *args, **kwargs
+) -> Union[CellFormat, FakeFormat]:
+    format_getter = partial(format_getter, *args, **kwargs)
+    cell_format = None
+    with suppress(KeyError, AttributeError, TypeError):
+        cell_format = format_getter(*args, **kwargs)
+
+    return cell_format or FakeFormat()
