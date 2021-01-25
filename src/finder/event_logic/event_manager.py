@@ -38,7 +38,7 @@ class EventManager:
     def _operate_success(self):
         self.event.set_success()
         self.status = EventManagerStatus.SUCCESS
-        message = f"Event {self.event.pk} operated successfully"
+        message = f"Запрос по номеру вашего заказа {self.event.order_id} был обработан"
         operate_message(
             logger, self.telegram_client, message, MessageLevel.INFO
         )

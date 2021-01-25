@@ -30,7 +30,7 @@ class IntegerLengthValidator:
         min_length_cond = self.min_length and length < self.min_length
         max_length_cond = self.max_length and length > self.max_length
         if min_length_cond or max_length_cond:
-            error = f"Wrong integer parameter length for value {value}"
+            error = f"{value} - неправильный номер заказа. Ваш заказ должен состоять из 7 цифр"
             raise serializers.ValidationError(error)
 
 

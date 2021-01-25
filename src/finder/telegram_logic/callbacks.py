@@ -11,7 +11,7 @@ __all__ = (
 )
 
 
-SUCCESS_MESSAGE_TEMPLATE = "Event searching order {order_id} has been created"
+SUCCESS_MESSAGE_TEMPLATE = "Обрабатываю Ваш запрос по номеру заказа {order_id}. Ожидайте..."
 
 
 def event_success_callback(data: Dict[int, int]):
